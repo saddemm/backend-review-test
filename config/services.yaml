@@ -26,3 +26,8 @@ services:
         tags: [ 'controller.service_arguments' ]
 
     App\Entity\EventType: ~
+
+  # Guzzle
+    App\Service\GuzzleClient:
+      arguments:
+        $baseUri: 'https://data.gharchive.org'

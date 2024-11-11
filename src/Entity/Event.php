@@ -59,10 +59,9 @@ class Event
      */
     private ?string $comment;
 
-    public function __construct(int $id, string $type, Actor $actor, Repo $repo, array $payload, \DateTimeImmutable $createAt, ?string $comment)
+    public function __construct(int $id, string $type, Actor $actor, Repo $repo, array $payload, \DateTimeImmutable $createAt, ?string $comment = null)
     {
         $this->id = $id;
-        EventType::assertValidChoice($type);
         $this->type = $type;
         $this->actor = $actor;
         $this->repo = $repo;
@@ -70,11 +69,34 @@ class Event
         $this->createAt = $createAt;
         $this->comment = $comment;
 
+        // Définition de `count` pour les événements de type COMMIT
         if ($type === EventType::COMMIT) {
             $this->count = $payload['size'] ?? 1;
         }
     }
 
+    /**
+     * Méthode statique pour instancier un Event depuis un tableau de données.
+     *
+     * @param array $data  Les données de l'événement
+     * @param Actor $actor L'entité Actor associée
+     * @param Repo $repo   L'entité Repo associée
+     * @return self
+     */
+    public static function fromArray(array $data, Actor $actor, Repo $repo): self
+    {
+        return new self(
+            (int) $data['id'],
+            $data['type'],
+            $actor,
+            $repo,
+            $data['payload'],
+            new \DateTimeImmutable($data['created_at']),
+            $data['comment'] ?? null
+        );
+    }
+
+    // Getters
     public function id(): int
     {
         return $this->id;
